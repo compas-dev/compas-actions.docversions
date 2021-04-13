@@ -1,0 +1,40 @@
+name: 'compas-actions.docversions'
+description: 'Update doc versions list for COMPAS repos'
+
+inputs:
+  current-patch:
+    description: 'the current patch version number that is being deployed'
+    required: true
+  only-keep-latest-patch:
+    description: 'whether to only keep latest patch or each minor versions'
+    required: true
+    default: 'true'
+  doc-versions-path:
+    description: 'the path of doc version list file'
+    required: true
+    default: 'doc_versions.txt'
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        echo latest > doc_versions.txt
+        CURRENT_PATCH=${{ inputs.current-patch }}
+        CURRENT_MINOR=${CURRENT_PATCH%.*}
+        echo current patch: $CURRENT_PATCH current minor: $CURRENT_MINOR
+        for folder in $(ls -rd */ | tr -d '/')
+        do
+            if [[ $folder =~ ^[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}$ ]]; then
+                PATCH=$folder
+                MINOR=${folder%.*}
+                if [[ $PATCH != $CURRENT_PATCH && $MINOR = $CURRENT_MINOR ]]; then
+                    echo $PATCH will be deleted
+                    rm -Rf $PATCH
+                else
+                    echo $PATCH  >> doc_versions.txt
+                fi
+            fi
+        done
+        echo updated doc versions:
+        cat doc_versions.txt
