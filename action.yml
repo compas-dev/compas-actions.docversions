@@ -2,14 +2,14 @@ name: 'compas-actions.docversions'
 description: 'Update doc versions list for COMPAS repos'
 
 inputs:
-  current-patch:
+  current_patch:
     description: 'the current patch version number that is being deployed'
     required: true
-  only-keep-latest-patch:
+  only_keep_latest_patch:
     description: 'whether to only keep latest patch or each minor versions'
     required: true
     default: 'true'
-  doc-versions-path:
+  doc_versions_path:
     description: 'the path of doc version list file'
     required: true
     default: 'doc_versions.txt'
@@ -19,8 +19,8 @@ runs:
   steps:
     - shell: bash
       run: |
-        echo latest > doc_versions.txt
-        CURRENT_PATCH=${{ inputs.current-patch }}
+        echo latest > ${{ inputs.doc_versions_path }}
+        CURRENT_PATCH=${{ inputs.current_patch }}
         CURRENT_MINOR=${CURRENT_PATCH%.*}
         echo current patch: $CURRENT_PATCH current minor: $CURRENT_MINOR
         for folder in $(ls -rd */ | tr -d '/')
@@ -28,13 +28,13 @@ runs:
             if [[ $folder =~ ^[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}$ ]]; then
                 PATCH=$folder
                 MINOR=${folder%.*}
-                if [[ $PATCH != $CURRENT_PATCH && $MINOR = $CURRENT_MINOR ]]; then
+                if [[ $PATCH != $CURRENT_PATCH && $MINOR = $CURRENT_MINOR && ${{ inputs.only_keep_latest_patch }} = "true" ]]; then
                     echo $PATCH will be deleted
                     rm -Rf $PATCH
                 else
-                    echo $PATCH  >> doc_versions.txt
+                    echo $PATCH  >> ${{ inputs.doc_versions_path }}
                 fi
             fi
         done
         echo updated doc versions:
-        cat doc_versions.txt
+        cat ${{ inputs.doc_versions_path }}
