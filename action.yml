@@ -61,11 +61,11 @@ runs:
                         echo $folder will be deleted
                         rm -Rf $folder
                     else
-                        echo $folder  >> doc_version.txt
+                        echo $folder  >> ${{ inputs.doc_versions_path }}
                     fi
                 fi
             done
         fi
 
         echo updated doc versions:
-        cat doc_version.txt
+        echo $folder  >> ${{ inputs.doc_versions_path }}
