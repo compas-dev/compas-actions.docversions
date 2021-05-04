@@ -68,4 +68,4 @@ runs:
         fi
 
         echo updated doc versions:
-        echo $folder  >> ${{ inputs.doc_versions_path }}
+        cat ${{ inputs.doc_versions_path }}
