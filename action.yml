@@ -2,8 +2,8 @@ name: 'compas-actions.docversions'
 description: 'Update doc versions list for COMPAS repos'
 
 inputs:
-  current_patch:
-    description: 'the current patch version number that is being deployed'
+  current_version:
+    description: 'the current doc version number that is being deployed'
     required: true
   only_keep_latest_patch:
     description: 'whether to only keep latest patch or each minor versions'
@@ -20,21 +20,52 @@ runs:
     - shell: bash
       run: |
         echo latest > ${{ inputs.doc_versions_path }}
-        CURRENT_PATCH=${{ inputs.current_patch }}
+
+        CURRENT_VERSION=${{ inputs.current_version }}
+        CURRENT_PATCH=${CURRENT_VERSION%rc*}
         CURRENT_MINOR=${CURRENT_PATCH%.*}
-        echo current patch: $CURRENT_PATCH current minor: $CURRENT_MINOR
-        for folder in $(ls -rd */ | tr -d '/')
-        do
-            if [[ $folder =~ ^[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}$ ]]; then
-                PATCH=$folder
-                MINOR=${folder%.*}
-                if [[ $PATCH != $CURRENT_PATCH && $MINOR = $CURRENT_MINOR && ${{ inputs.only_keep_latest_patch }} = "true" ]]; then
-                    echo $PATCH will be deleted
-                    rm -Rf $PATCH
-                else
-                    echo $PATCH  >> ${{ inputs.doc_versions_path }}
+
+        echo current patch: $CURRENT_PATCH 
+        echo current minor: $CURRENT_MINOR
+
+        if [[ $CURRENT_VERSION =~ "rc" ]]; then 
+            echo this is a RC
+            CURRENT_RC=${CURRENT_VERSION##*rc}
+            echo current rc: $CURRENT_RC
+        fi
+
+        if [ -z "${CURRENT_RC}" ]; then
+            echo This is a formal release, will remove past patches of same minor version as well as previous release candidates.
+            for folder in $(ls -rd */ | tr -d '/')
+            do
+                if [[ $folder =~ ^[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}(rc[0-9]{1,2})?$ ]]; then
+                    PATCH=$folder
+                    MINOR=${PATCH%.*}
+                    if [[ $PATCH != $CURRENT_PATCH && $MINOR = $CURRENT_MINOR && ${{ inputs.only_keep_latest_patch }} = "true" ]]; then
+                        echo $folder will be deleted
+                        rm -Rf $folder
+                    else
+                        echo $folder  >> ${{ inputs.doc_versions_path }}
+                    fi
                 fi
-            fi
-        done
+            done
+        else
+            echo This is a release candidate, will remove previous candidates of same patch.
+            for folder in $(ls -rd */ | tr -d '/')
+            do
+                if [[ $folder =~ ^[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}(rc[0-9]{1,2})?$ ]]; then
+                    PATCH=${folder%rc*}
+                    MINOR=${PATCH%.*}
+                    RC=${folder##*rc}
+                    if [[ $RC != $CURRENT_RC && $PATCH = $CURRENT_PATCH ]]; then
+                        echo $folder will be deleted
+                        rm -Rf $folder
+                    else
+                        echo $folder  >> doc_version.txt
+                    fi
+                fi
+            done
+        fi
+
         echo updated doc versions:
-        cat ${{ inputs.doc_versions_path }}
+        cat doc_version.txt
