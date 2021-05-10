@@ -13,10 +13,20 @@ inputs:
     description: 'the path of doc version list file'
     required: true
     default: 'doc_versions.txt'
+  index_and_nojekyll:
+    description: 'Create index.html and .nojekll at root'
+    required: true
+    default: 'true'
 
 runs:
   using: "composite"
   steps:
+    - shell: bash
+      run: |
+        if [[ ${{ inputs.index_and_nojekyll }} = "true" ]]; then
+            > .nojekll
+            echo '<meta http-equiv="refresh" content="0; url=/${{ github.repository }}/latest/index.html">' > index.html
+        fi
     - shell: bash
       run: |
         echo latest > ${{ inputs.doc_versions_path }}
