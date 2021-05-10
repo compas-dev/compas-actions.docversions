@@ -24,8 +24,11 @@ runs:
     - shell: bash
       run: |
         if [[ ${{ inputs.index_and_nojekyll }} = "true" ]]; then
+            echo creating index.html and .nojekll
             > .nojekll
-            echo '<meta http-equiv="refresh" content="0; url=/${{ github.repository }}/latest/index.html">' > index.html
+            full_repo=${{ github.repository }}
+            repo=${full_repo#*/}
+            echo '<meta http-equiv="refresh" content="0; url=/'$repo'/latest/index.html">' > index.html
         fi
     - shell: bash
       run: |
