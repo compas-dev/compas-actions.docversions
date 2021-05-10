@@ -14,7 +14,7 @@ inputs:
     required: true
     default: 'doc_versions.txt'
   index_and_nojekyll:
-    description: 'Create index.html and .nojekll at root'
+    description: 'Create index.html and .nojekyll at root'
     required: true
     default: 'true'
 
@@ -24,8 +24,8 @@ runs:
     - shell: bash
       run: |
         if [[ ${{ inputs.index_and_nojekyll }} = "true" ]]; then
-            echo creating index.html and .nojekll
-            > .nojekll
+            echo creating index.html and .nojekyll
+            > .nojekyll
             full_repo=${{ github.repository }}
             repo=${full_repo#*/}
             echo '<meta http-equiv="refresh" content="0; url=/'$repo'/latest/index.html">' > index.html
