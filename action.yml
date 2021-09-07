@@ -19,7 +19,7 @@ runs:
   steps:
     - shell: bash
       run: |
-        echo latest > ${{ inputs.doc_versions_path }}
+        echo dev > ${{ inputs.doc_versions_path }}
 
         CURRENT_VERSION=${{ inputs.current_version }}
         CURRENT_PATCH=${CURRENT_VERSION%rc*}
