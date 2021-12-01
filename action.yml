@@ -20,6 +20,9 @@ runs:
     - shell: bash
       run: |
         echo dev > ${{ inputs.doc_versions_path }}
+        echo latest >> ${{ inputs.doc_versions_path }}
+
+        cp -rT ${{ inputs.current_version }} latest
 
         CURRENT_VERSION=${{ inputs.current_version }}
         CURRENT_PATCH=${CURRENT_VERSION%rc*}
