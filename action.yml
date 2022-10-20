@@ -13,10 +13,18 @@ inputs:
     description: 'the path of doc version list file'
     required: true
     default: 'doc_versions.txt'
+  token:
+    description: 'the github token for publishing docs'
+    required: true
+    default: ''
 
 runs:
   using: "composite"
   steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: gh-pages
+
     - shell: bash
       run: |
         echo latest > ${{ inputs.doc_versions_path }}
@@ -72,3 +80,13 @@ runs:
 
         echo updated doc versions:
         cat ${{ inputs.doc_versions_path }}
+
+    - name: Deploy docs
+      if: success()
+      uses: crazy-max/ghaction-github-pages@v2
+      with:
+        target_branch: gh-pages
+        build_dir: ./
+        keep_history: false
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
