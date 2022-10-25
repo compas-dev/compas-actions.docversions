@@ -13,7 +13,7 @@ inputs:
     description: 'the path of doc version list file'
     required: true
     default: 'doc_versions.txt'
-  token:
+  github_token:
     description: 'the github token for publishing docs'
     required: true
     default: ''
@@ -89,4 +89,4 @@ runs:
         build_dir: ./
         keep_history: false
       env:
-        GITHUB_TOKEN: ${{ inputs.token }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
