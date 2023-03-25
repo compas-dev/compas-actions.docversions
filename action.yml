@@ -30,6 +30,11 @@ runs:
         echo latest > ${{ inputs.doc_versions_path }}
         echo stable >> ${{ inputs.doc_versions_path }}
 
+        # Add LTS folder if exists
+        if [ -d 1.x.LTS ]; then
+            echo 1.x.LTS >> ${{ inputs.doc_versions_path }}
+        fi
+
         cp -rT ${{ inputs.current_version }} stable
 
         CURRENT_VERSION=${{ inputs.current_version }}
