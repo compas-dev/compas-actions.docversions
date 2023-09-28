@@ -35,7 +35,10 @@ runs:
             echo 1.x.LTS >> ${{ inputs.doc_versions_path }}
         fi
 
-        cp -rT ${{ inputs.current_version }} stable
+        # Skip pre-release like 1.0.0-alpha.1
+        if [[ ! "${{ inputs.current_version }}" =~ [0-9]+\.[0-9]+\.[0-9]+-[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)* ]]; then
+            cp -rT ${{ inputs.current_version }} stable
+        fi
 
         CURRENT_VERSION=${{ inputs.current_version }}
         CURRENT_PATCH=${CURRENT_VERSION%rc*}
