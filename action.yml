@@ -1,111 +1,37 @@
 name: 'compas-actions.docversions'
 description: 'Update doc versions list for COMPAS repos'
 
-inputs:
-  current_version:
-    description: 'the current doc version number that is being deployed'
-    required: true
-  only_keep_latest_patch:
-    description: 'whether to only keep latest patch or each minor versions'
-    required: true
-    default: 'true'
-  github_token:
-    description: 'the github token for publishing docs'
-    required: true
-    default: ''
+# inputs:
+#   current_version:
+#     description: 'the current doc version number that is being deployed'
+#     required: true
+#   only_keep_latest_patch:
+#     description: 'whether to only keep latest patch or each minor versions'
+#     required: true
+#     default: 'true'
+#   github_token:
+#     description: 'the github token for publishing docs'
+#     required: true
+#     default: ''
 
 runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v4
+      # with:
+      #   ref: gh-pages
+
+    - name: Now Calling the Node action in directory ./actions/node-action
+      uses: ./node-action
       with:
-        ref: gh-pages
+        who-to-greet: 'Me'
 
-    - shell: bash
-      run: |
-        # Create versions.json
-        echo '[' > versions.json
-
-        # Function to add a JSON entry
-        add_json_entry() {
-            NAME=$1
-            VERSION=$2
-            URL=$3
-            COMMA=$4
-
-            echo '  {' >> versions.json
-            echo '    "name": "'$NAME'",' >> versions.json
-            echo '    "version": "'$VERSION'",' >> versions.json
-            echo '    "url": "'$URL'"' >> versions.json
-            echo '  }'$COMMA >> versions.json
-        }
-
-        # Add 'latest' version entry
-        add_json_entry "latest" "unreleased" "${{ inputs.doc_url }}/latest/" ","
-
-        # Skip pre-release like 1.0.0-alpha.1
-        if [[ ! "${{ inputs.current_version }}" =~ [0-9]+\.[0-9]+\.[0-9]+-[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)* ]]; then
-            cp -rT ${{ inputs.current_version }} stable
-            add_json_entry "${{ inputs.current_version }} (stable)" "${{ inputs.current_version }}" "${{ inputs.doc_url }}/${{ inputs.current_version }}/" ","
-        fi
-
-        CURRENT_VERSION=${{ inputs.current_version }}
-        CURRENT_PATCH=${CURRENT_VERSION%-*}
-        CURRENT_MINOR=${CURRENT_PATCH%.*}
-
-        echo current patch: $CURRENT_PATCH 
-        echo current minor: $CURRENT_MINOR
-
-        # Determine if this is a pre-release
-        if [[ $CURRENT_VERSION =~ \d+\.\d+\.\d+-(alpha|beta|rc)\.\d+ ]]; then 
-            echo this is a SemVer 2.0 pre-release version
-            CURRENT_PRERELEASE=${CURRENT_VERSION##*-}
-            echo current pre-release: $CURRENT_PRERELEASE
-        fi
-
-        if [ -z "${CURRENT_PRERELEASE}" ]; then
-            echo This is a formal release, will remove past patches of same minor version as well as previous release candidates.
-            for folder in $(ls -rd */ | tr -d '/')
-            do
-                if [[ $folder =~ ^[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}(-[alpha|beta|rc]\.[0-9]{1,2})?$ ]]; then
-                    PATCH=$folder
-                    MINOR=$(echo $PATCH | cut -d'-' -f1 | cut -d'.' -f1,2)
-                    if [[ $PATCH != $CURRENT_PATCH && $MINOR = $CURRENT_MINOR && ${{ inputs.only_keep_latest_patch }} = "true" ]]; then
-                        echo $folder will be deleted
-                        rm -Rf $folder
-                    else
-                        echo $folder  >> ${{ inputs.doc_versions_path }}
-                        add_json_entry "${{ inputs.current_version }} (stable)" "${{ inputs.current_version }}" "${{ inputs.doc_url }}/${{ inputs.current_version }}/" ","
-                    fi
-                fi
-            done
-        else
-            echo This is a release candidate, will remove previous candidates of same patch.
-            for folder in $(ls -rd */ | tr -d '/')
-            do
-                if [[ $folder =~ ^[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}(rc[0-9]{1,2})?$ ]]; then
-                    PATCH=${folder%rc*}
-                    MINOR=${PATCH%.*}
-                    RC=${folder##*rc}
-                    if [[ $RC != $CURRENT_PRERELEASE && $PATCH = $CURRENT_PATCH ]]; then
-                        echo $folder will be deleted
-                        rm -Rf $folder
-                    else
-                        echo $folder  >> ${{ inputs.doc_versions_path }}
-                    fi
-                fi
-            done
-        fi
-
-        echo updated doc versions:
-        cat ${{ inputs.doc_versions_path }}
-
-    - name: Deploy docs
-      if: success()
-      uses: crazy-max/ghaction-github-pages@v2
-      with:
-        target_branch: gh-pages
-        build_dir: ./
-        keep_history: false
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
+    # - name: Deploy docs
+    #   if: success()
+    #   uses: crazy-max/ghaction-github-pages@v2
+    #   with:
+    #     target_branch: gh-pages
+    #     build_dir: ./
+    #     keep_history: false
+    #   env:
+    #     GITHUB_TOKEN: ${{ inputs.github_token }}
