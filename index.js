@@ -66,6 +66,14 @@ try {
     };
   });
 
+  versionsJSON = [
+    {
+      name: "Latest",
+      version: "latest",
+      url: docURL + "latest"
+    }
+  ] + versionsJSON;
+
   console.log("Versions JSON: ", versionsJSON);
   fs.writeFileSync('versions.json', JSON.stringify(versionsJSON, null, 2));
 
