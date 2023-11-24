@@ -29902,7 +29902,17 @@ try {
   console.log("Versions JSON: ", json);
   fs.writeFileSync('versions.json', json);
 
-  // Update stable/index.html
+  // Create top-level index.html to redirect to latest
+  if (!fs.existsSync("index.html")) {
+    fs.writeFileSync('index.html', `<meta http-equiv="refresh" content="0; url=${docURL}latest/">`, { encoding: 'utf8' });
+  }
+
+  // Create .nojekyll if not exists
+  if (!fs.existsSync(".nojekyll")) {
+    fs.writeFileSync('.nojekyll', '');
+  }
+
+  // Update stable/index.html to redirect to stable
   if (fs.existsSync("stable")) {
     fs.rmSync("stable", { recursive: true });
   }
