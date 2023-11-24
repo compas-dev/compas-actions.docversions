@@ -2,8 +2,8 @@ name: 'compas-actions.docversions'
 description: 'Update doc versions list for COMPAS repos'
 
 inputs:
-  current_version:
-    description: 'the current doc version number that is being deployed'
+  doc_url:
+    description: 'the url of the doc site'
     required: true
   only_keep_latest_patch:
     description: 'whether to only keep latest patch or each minor versions'
