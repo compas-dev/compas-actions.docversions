@@ -74,8 +74,10 @@ try {
     }
   ] + versionsJSON;
 
-  console.log("Versions JSON: ", versionsJSON);
-  fs.writeFileSync('versions.json', JSON.stringify(versionsJSON, null, 2));
+  let json = JSON.stringify(versionsJSON, null, 2);
+
+  console.log("Versions JSON: ", json);
+  fs.writeFileSync('versions.json', json);
 
 } catch (error) {
   core.setFailed(error.message);
