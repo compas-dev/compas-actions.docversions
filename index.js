@@ -62,7 +62,7 @@ try {
     return {
       name: name,
       version: item,
-      url: docURL + item
+      url: docURL + item + "/"
     };
   });
 
@@ -70,14 +70,12 @@ try {
     {
       name: "Latest",
       version: "latest",
-      url: docURL + "latest"
+      url: docURL + "latest/"
     }
-  ] + versionsJSON;
+  ].concat(versionsJSON);
 
-  let json = JSON.stringify(versionsJSON, null, 2);
-
-  console.log("Versions JSON: ", json);
-  fs.writeFileSync('versions.json', json);
+  console.log("versions.json: ", versionsJSON);
+  fs.writeFileSync('versions.json', JSON.stringify(versionsJSON, null, 2));
 
   // Create top-level index.html to redirect to latest
   if (!fs.existsSync("index.html")) {
