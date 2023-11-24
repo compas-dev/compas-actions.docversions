@@ -1,37 +1,14 @@
 name: 'compas-actions.docversions'
 description: 'Update doc versions list for COMPAS repos'
 
-# inputs:
-#   current_version:
-#     description: 'the current doc version number that is being deployed'
-#     required: true
-#   only_keep_latest_patch:
-#     description: 'whether to only keep latest patch or each minor versions'
-#     required: true
-#     default: 'true'
-#   github_token:
-#     description: 'the github token for publishing docs'
-#     required: true
-#     default: ''
-
+inputs:
+  who-to-greet:  # id of input
+    description: 'Who to greet'
+    required: false
+    default: 'World'
+outputs:
+  time: # id of output
+    description: 'The time we greeted you'
 runs:
-  using: "composite"
-  steps:
-    - uses: actions/checkout@v4
-      # with:
-      #   ref: gh-pages
-
-    - name: Now Calling the Node action in directory ./actions/node-action
-      uses: ./node-action
-      with:
-        who-to-greet: 'Me'
-
-    # - name: Deploy docs
-    #   if: success()
-    #   uses: crazy-max/ghaction-github-pages@v2
-    #   with:
-    #     target_branch: gh-pages
-    #     build_dir: ./
-    #     keep_history: false
-    #   env:
-    #     GITHUB_TOKEN: ${{ inputs.github_token }}
+  using: 'node20'
+  main: 'index.js'
