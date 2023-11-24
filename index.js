@@ -79,6 +79,15 @@ try {
   console.log("Versions JSON: ", json);
   fs.writeFileSync('versions.json', json);
 
+  // Update stable/index.html
+  if (fs.existsSync("stable")) {
+    fs.rmSync("stable", { recursive: true });
+  }
+  fs.mkdirSync("stable");
+  let index = `<meta http-equiv="refresh" content="0; url=${docURL}${stable}/">`;
+  fs.writeFileSync('stable/index.html', index, { encoding: 'utf8' });
+  console.log("Written to stable/index.html:", index);
+
 } catch (error) {
   core.setFailed(error.message);
 }
