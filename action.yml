@@ -2,13 +2,14 @@ name: 'compas-actions.docversions'
 description: 'Update doc versions list for COMPAS repos'
 
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
-    required: false
-    default: 'World'
-outputs:
-  time: # id of output
-    description: 'The time we greeted you'
+  current_version:
+    description: 'the current doc version number that is being deployed'
+    required: true
+  only_keep_latest_patch:
+    description: 'whether to only keep latest patch or each minor versions'
+    required: true
+    default: 'true'
+
 runs:
   using: 'node20'
   main: 'dist/index.js'

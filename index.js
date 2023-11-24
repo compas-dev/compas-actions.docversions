@@ -1,15 +1,23 @@
 const core = require('@actions/core');
-const github = require('@actions/github');
+const semver = require('semver');
+const fs = require('fs');
 
 try {
-  // `who-to-greet` input defined in action metadata file
-  const nameToGreet = core.getInput('who-to-greet');
-  console.log(`Hello ${nameToGreet}!`);
-  const time = (new Date()).toTimeString();
-  core.setOutput("time", time);
-  // Get the JSON webhook payload for the event that triggered the workflow
-  const payload = JSON.stringify(github.context.payload, undefined, 2)
-  console.log(`The event payload: ${payload}`);
+  const currentVersion = core.getInput('current_version');
+  const onlyKeepLatestPatch = core.getInput('only_keep_latest_patch');
+
+  console.log("Current version: ", currentVersion);
+  console.log("Only keep latest patch: ", onlyKeepLatestPatch);
+
+  let directories = fs.readdirSync('./');
+  let versions = directories.filter((item) => {
+    let isFolder = fs.statSync(item).isDirectory();
+    let isValidSemver = semver.valid(item);
+    return isFolder && isValidSemver;
+  });
+
+  console.log("Found versions: ", versions);
+
 } catch (error) {
   core.setFailed(error.message);
 }
