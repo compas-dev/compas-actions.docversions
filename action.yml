@@ -3,8 +3,8 @@ description: 'Update doc versions list for COMPAS repos'
 
 inputs:
   doc_url:
-    description: 'the url of the doc site'
-    required: true
+    description: 'The custom url of the doc site, otherwise default gh-pages url will be used'
+    required: false
   only_keep_latest_patch:
     description: 'whether to only keep latest patch or each minor versions'
     required: true

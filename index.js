@@ -6,6 +6,13 @@ try {
   const onlyKeepLatestPatch = core.getInput('only_keep_latest_patch');
   let docURL = core.getInput('doc_url');
 
+  if (!docURL){
+    const repoName = github.context.repo.repo;
+    const owner = github.context.repo.owner;
+    docURL = `https://${owner}.github.io/${repoName}`;
+    console.log("Default to gh-pages docURL", docURL)
+  }
+
   docURL = docURL.endsWith('/') ? docURL : docURL + '/'
 
   let directories = fs.readdirSync('./');
